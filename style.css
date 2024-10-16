@@ -1,0 +1,131 @@
+/* Style for the body */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ecef; /* Slightly different background for contrast */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Center container */
+.container {
+    text-align: center;
+    background-color: #fff; /* White background for the container */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Style for the heading */
+h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* Style for the button */
+button {
+    padding: 12px 25px;
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+button:active {
+    transform: translateY(0); /* Reset lift on click */
+}
+
+/* Style for the emails list */
+#emails {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+    background-color: #f9f9f9; /* Light gray background for email list */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+/* Style for each email item */
+#emails div {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between; /* Align text and count on both ends */
+}
+
+#emails div:last-child {
+    border-bottom: none;
+}
+
+#emails div:hover {
+    background-color: #f1f1f1; /* Highlight on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+
+    #emails {
+        width: 90%;
+    }
+}
+
+/* Style for the dropdown */
+label {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #555;
+}
+
+select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+select:hover {
+    border-color: #007BFF; /* Highlight border on hover */
+}
+
+
+/* Style for the unsubscribe button */
+.unsubscribe-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #dc3545; /* Red color for unsubscribe */
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.unsubscribe-button:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
