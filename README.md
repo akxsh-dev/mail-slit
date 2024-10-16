@@ -1,7 +1,7 @@
 # MailSlit
 
 ## Overview
-The Email Subscription Scanner is a web-based application that helps users efficiently manage their email subscriptions. By scanning the user's Gmail inbox, the app identifies subscription emails and provides an easy way to unsubscribe from them or mark them as spam. This project utilizes the Gmail API and provides a clean interface for email management.
+MailSlit is a web-based application that helps users efficiently manage their email subscriptions. By scanning the user's Gmail inbox, the app identifies subscription emails and provides an easy way to unsubscribe from them or mark them as spam. This project utilizes the Gmail API and provides a clean interface for email management.
 
 ## Features
 - **Scan Gmail for Subscription Emails:** The app searches for emails containing "unsubscribe" links or subscription-related keywords.
