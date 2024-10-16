@@ -1,17 +1,16 @@
 #Email Subscription Scanner
+Overview
+The Email Subscription Scanner is a web-based application that helps users efficiently manage their email subscriptions. By scanning the user's Gmail inbox, the app identifies subscription emails and provides an easy way to unsubscribe from them or mark them as spam. This project utilizes the Gmail API and provides a clean interface for email management.
 
-##Project Overview
-Email Subscription Scanner is a web application that allows users to easily manage their email subscriptions. The app connects to the user’s Gmail account, scans for emails related to subscriptions, and offers the ability to unsubscribe directly from the interface. By automating this process, it helps users reduce inbox clutter and manage their subscriptions more effectively.
-
-##Features
-Scan for Subscription Emails: Automatically detects subscription or promotional emails in the inbox.
-Unsubscribe with One Click: Easily unsubscribe from unwanted emails directly from the interface.
-OAuth2 Secure Authentication: Securely access Gmail inbox using OAuth2 to read and manage emails.
-Email Categorization: Groups emails by sender and displays the number of emails received from each sender.
-Built Using React and Node.js: Frontend is built with React, and the backend uses Node.js to handle Gmail API requests.
+Features
+Scan Gmail for Subscription Emails: The app searches for emails containing "unsubscribe" links or subscription-related keywords.
+Unsubscribe Functionality: Users can unsubscribe from mailing lists directly within the app.
+Email Categorization: Emails are categorized by sender, giving users a clear view of subscription emails from different sources.
+Mark as Spam: If unsubscribing is not available, users can mark emails as spam to block future emails from that sender.
+Google OAuth2 Integration: Securely log in and authorize the app to scan and manage subscription emails using OAuth2.
 Technologies Used
-Frontend: React, HTML, CSS
-Backend: Node.js, Express.js
+Front-end: React.js, HTML, CSS
+Back-end: Node.js, Express.js
 API: Gmail API
-Authentication: OAuth2 (Google Authentication)
+Authentication: OAuth 2.0
 Version Control: Git & GitHub
