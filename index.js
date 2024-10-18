@@ -1,3 +1,4 @@
+// index.js
 // Import necessary modules
 const fs = require('fs');
 const readline = require('readline');
@@ -5,6 +6,7 @@ const { google } = require('googleapis');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path'); // Import path module
+const s3 = require('./awsConfig.js');
 require('dotenv').config();
 
 // Initialize the Express application
@@ -21,9 +23,42 @@ app.get('/', (req, res) => {
 
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly',
                 'https://www.googleapis.com/auth/gmail.modify'];
-const TOKEN_PATH = 'token.json';
-
+const bucketName = 'mailslit-oauth-tokens';
+const tokenKey = 'tokens/token.json'; // Adjust the path as needed
 let oAuth2Client;
+
+// Upload token to S3
+async function uploadToken(token) {
+    const params = {
+        Bucket: bucketName,
+        Key: tokenKey,
+        Body: JSON.stringify(token),
+        ContentType: 'application/json',
+    };
+
+    try {
+        await s3.putObject(params).promise();
+        console.log('Token uploaded successfully.');
+    } catch (error) {
+        console.error('Error uploading token:', error);
+    }
+}
+
+// Download token from S3
+async function downloadToken() {
+    const params = {
+        Bucket: bucketName,
+        Key: tokenKey,
+    };
+
+    try {
+        const data = await s3.getObject(params).promise();
+        return JSON.parse(data.Body.toString('utf-8'));
+    } catch (error) {
+        console.error('Error downloading token:', error);
+        return null; // Handle as appropriate
+    }
+}
 
 // Load client secrets from a local file and authorize the client
 fs.readFile('client_id.json', (err, content) => {
@@ -34,17 +69,18 @@ fs.readFile('client_id.json', (err, content) => {
 });
 
 // Function to authorize the client and obtain the OAuth2 client
-function authorize(credentials) {
+async function authorize(credentials) {
     const { client_secret, client_id, redirect_uris } = credentials.web;
     oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) {
-            return getAccessToken(oAuth2Client);
-        }
-        oAuth2Client.setCredentials(JSON.parse(token));
-        console.log('Tokens loaded, ready to fetch emails!');
-    });
+    // Load token from S3 instead of local file
+    const token = await downloadToken();
+    if (token) {
+        oAuth2Client.setCredentials(token);
+        console.log('Tokens loaded from S3, ready to fetch emails!');
+    } else {
+        getAccessToken(oAuth2Client);
+    }
 }
 
 // Function to get a new access token
@@ -61,23 +97,17 @@ function getAccessToken(oAuth2Client) {
         output: process.stdout,
     });
 
-    rl.question('Enter the code from that page here: ', (code) => {
+    rl.question('Enter the code from that page here: ', async (code) => {
         rl.close();
-        oAuth2Client.getToken(code, (err, token) => {
+        oAuth2Client.getToken(code, async (err, token) => {
             if (err) {
-                console.error('Error retrieving access token', err); // Log detailed error
-                return; // Exit early if there's an error
+                console.error('Error retrieving access token', err);
+                return;
             }
-            console.log('Retrieved token:', token); // Log the retrieved token
+            console.log('Retrieved token:', token);
             oAuth2Client.setCredentials(token);
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) {
-                    console.error('Error writing token to file:', err); // Log error for file writing
-                    return;
-                }
-                console.log('Token stored to', TOKEN_PATH);
-            });
-            console.log('Tokens stored, ready to fetch emails!');
+            await uploadToken(token); // Upload token to S3
+            console.log('Tokens stored in S3, ready to fetch emails!');
         });
     });
 }
@@ -189,7 +219,7 @@ app.get('/oauth2callback', async (req, res) => {
     try {
         const { tokens } = await oAuth2Client.getToken(code);
         oAuth2Client.setCredentials(tokens);
-        // Here, you'd want to store the token securely (in a DB or cloud storage)
+        await uploadToken(tokens); // Upload tokens to S3
         res.redirect('/');
     } catch (error) {
         console.error('Error during OAuth callback:', error);
