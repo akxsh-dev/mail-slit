@@ -169,6 +169,46 @@ app.post('/unsubscribe', async (req, res) => {
     }
 });
 
+// OAuth2 Web-Based Flow Additions
+
+// Initialize OAuth2 Client
+function initOAuth2Client() {
+    const client_id = process.env.CLIENT_ID;
+    const client_secret = process.env.CLIENT_SECRET;
+    const redirect_uris = process.env.REDIRECT_URI || 'https://your-vercel-deployment-url/oauth2callback';
+    oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris);
+}
+
+// Route to handle OAuth2 callback
+app.get('/oauth2callback', async (req, res) => {
+    const code = req.query.code;
+    if (!code) {
+        return res.status(400).send('No code provided.');
+    }
+
+    try {
+        const { tokens } = await oAuth2Client.getToken(code);
+        oAuth2Client.setCredentials(tokens);
+        // Here, you'd want to store the token securely (in a DB or cloud storage)
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error during OAuth callback:', error);
+        res.status(500).send('OAuth callback failed.');
+    }
+});
+
+// Route to trigger OAuth2 authorization
+app.get('/authorize', (req, res) => {
+    if (!oAuth2Client) {
+        initOAuth2Client();
+    }
+    const authUrl = oAuth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: SCOPES,
+    });
+    res.redirect(authUrl);
+});
+
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
