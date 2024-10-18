@@ -7,10 +7,19 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["email", "subscription", "scanner", "gmail", "unsubscribe", "nodejs"],
+  "keywords": [
+    "email",
+    "subscription",
+    "scanner",
+    "gmail",
+    "unsubscribe",
+    "nodejs"
+  ],
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.674.0",
+    "aws-sdk": "^2.1691.0",
     "body-parser": "^1.20.3",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
