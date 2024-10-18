@@ -3,23 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MailSlit</title>
+    <title>MailSlit - Login with Gmail</title>
     <link rel="stylesheet" href="style.css"> <!-- Optional CSS -->
 </head>
 <body>
     <div class="container">
-        <h1>MailSLit</h1>
-        <button id="authButton">Authorize App</button>
-        
-        <label for="sortOptions">Sort Emails:</label>
-        <select id="sortOptions">
-            <option value="highest">Highest to Lowest</option>
-            <option value="lowest">Lowest to Highest</option>
-        </select>
+        <h1>Welcome to MailSlit</h1>
+        <p>Click the button below to log in to your Gmail account and manage your subscriptions.</p>
+        <a href="/authorize" class="login-btn">Login with Gmail</a>
 
-        <div id="emails"></div>
+        <div class="email-section">
+            <h2>Manage Your Subscription Emails</h2>
+            <label for="sortOptions">Sort Emails:</label>
+            <select id="sortOptions">
+                <option value="highest">Highest to Lowest</option>
+                <option value="lowest">Lowest to Highest</option>
+            </select>
+            <div id="emails"></div>
+        </div>
     </div>
 
-    <script src="script.js"></script> <!-- Link to your JavaScript file -->
+    <script>
+        // Wait until DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sorting emails based on the selection
+            const sortOptions = document.getElementById('sortOptions');
+            const emailContainer = document.getElementById('emails');
+
+            sortOptions.addEventListener('change', async () => {
+                const sortValue = sortOptions.value;
+                let emails = await fetchEmails(); // Fetch emails from backend
+                emails = sortEmails(emails, sortValue); // Sort emails based on selection
+                displayEmails(emails); // Display sorted emails
+            });
+
+            // Fetch emails from the backend
+            async function fetchEmails() {
+                const response = await fetch('/getEmails');
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    console.error('Failed to fetch emails');
+                    return [];
+                }
+            }
+
+            // Function to sort emails
+            function sortEmails(emails, sortValue) {
+                const sortedEmails = Object.entries(emails).sort(([, a], [, b]) => {
+                    return sortValue === 'highest' ? b - a : a - b;
+                });
+                return sortedEmails;
+            }
+
+            // Function to display emails in the DOM
+            function displayEmails(emails) {
+                emailContainer.innerHTML = ''; // Clear existing emails
+                emails.forEach(([email, count]) => {
+                    const emailDiv = document.createElement('div');
+                    emailDiv.textContent = `${email} - ${count} messages`;
+                    emailContainer.appendChild(emailDiv);
+                });
+            }
+
+            // Initially fetch and display emails
+            fetchEmails().then(emails => displayEmails(emails));
+        });
+    </script>
 </body>
 </html>
