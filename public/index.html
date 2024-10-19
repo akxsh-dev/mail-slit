@@ -11,7 +11,7 @@
         <h1>Welcome to MailSlit</h1>
         <p>Click the button below to log in to your Gmail account and manage your subscriptions.</p>
         <a href="/authorize" class="login-btn">Login with Gmail</a>
-
+    
         <div class="email-section">
             <h2>Manage Your Subscription Emails</h2>
             <label for="sortOptions">Sort Emails:</label>
@@ -19,45 +19,68 @@
                 <option value="highest">Highest to Lowest</option>
                 <option value="lowest">Lowest to Highest</option>
             </select>
+            <button id="fetchEmailsButton">Fetch Emails</button> <!-- Fetch Emails Button -->
             <div id="emails"></div>
         </div>
     </div>
+    
 
     <script>
         // Wait until DOM is fully loaded
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded and parsed');
             // Sorting emails based on the selection
             const sortOptions = document.getElementById('sortOptions');
             const emailContainer = document.getElementById('emails');
-
-            sortOptions.addEventListener('change', async () => {
-                const sortValue = sortOptions.value;
-                let emails = await fetchEmails(); // Fetch emails from backend
-                emails = sortEmails(emails, sortValue); // Sort emails based on selection
-                displayEmails(emails); // Display sorted emails
-            });
-
+    
             // Fetch emails from the backend
             async function fetchEmails() {
-                const response = await fetch('/getEmails');
-                if (response.ok) {
-                    return await response.json();
-                } else {
-                    console.error('Failed to fetch emails');
+                console.log('Fetching emails from backend');
+                // Extract the code from the URL query parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code'); // Correct variable name
+    
+                if (!code) {
+                    console.error('No code found in URL parameters.');
+                    return [];
+                }
+    
+                try {
+                    console.log('Sending request to /getEmails endpoint');
+                    // Send the code in the request body to the backend
+                    const response = await fetch('/getEmails', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ code }), // Send the code
+                    });
+    
+                    if (response.ok) {
+                        console.log('Emails fetched successfully');
+                        return await response.json();
+                    } else {
+                        console.error('Failed to fetch emails. Status:', response.status);
+                        return [];
+                    }
+                } catch (error) {
+                    console.error('Error occurred while fetching emails:', error);
                     return [];
                 }
             }
-
+    
             // Function to sort emails
             function sortEmails(emails, sortValue) {
+                console.log('Sorting emails:', sortValue);
                 const sortedEmails = Object.entries(emails).sort(([, a], [, b]) => {
                     return sortValue === 'highest' ? b - a : a - b;
                 });
                 return sortedEmails;
             }
-
+    
             // Function to display emails in the DOM
             function displayEmails(emails) {
+                console.log('Displaying emails');
                 emailContainer.innerHTML = ''; // Clear existing emails
                 emails.forEach(([email, count]) => {
                     const emailDiv = document.createElement('div');
@@ -65,10 +88,31 @@
                     emailContainer.appendChild(emailDiv);
                 });
             }
-
-            // Initially fetch and display emails
-            fetchEmails().then(emails => displayEmails(emails));
+    
+            // Event listener for sort options
+            sortOptions.addEventListener('change', async () => {
+                console.log('Sort option changed');
+                const sortValue = sortOptions.value;
+                let emails = await fetchEmails(); // Fetch emails from backend
+                emails = sortEmails(emails, sortValue); // Sort emails based on selection
+                displayEmails(emails); // Display sorted emails
+            });
+    
+            // Event listener for fetch emails button
+            document.getElementById('fetchEmailsButton').addEventListener('click', async () => {
+                console.log('Fetch Emails button clicked');
+                const emails = await fetchEmails(); // Call the function to fetch emails
+                displayEmails(emails); // Display the fetched emails
+            });
+    
+            // Initially fetch and display emails if code is present
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('code')) {
+                console.log('Authorization code found in URL. Fetching emails...');
+                fetchEmails().then(emails => displayEmails(emails));
+            }
         });
     </script>
+    
 </body>
 </html>
