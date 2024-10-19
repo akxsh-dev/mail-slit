@@ -1,3 +1,30 @@
+// Check if URL has the authorization code as a query parameter
+const urlParams = new URLSearchParams(window.location.search);
+const authCode = urlParams.get('code');
+
+if (authCode) {
+    // Send the auth code to the backend for token creation and S3 upload
+    fetch('/auth/code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: authCode })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Authorization successful, tokens generated and uploaded!");
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error sending code to the backend:", error);
+    });
+}
+
+// Event listeners for the buttons and dropdown
 document.getElementById('authButton').addEventListener('click', () => {
   fetchEmails();
 });
@@ -6,6 +33,7 @@ document.getElementById('sortOptions').addEventListener('change', () => {
   fetchEmails();
 });
 
+// Function to fetch emails from the backend
 function fetchEmails() {
   fetch('http://localhost:3001/getEmails')
       .then(response => response.json())
@@ -55,6 +83,7 @@ function fetchEmails() {
       });
 }
 
+// Function to unsubscribe from a sender
 function unsubscribe(sender) {
   // Send a request to unsubscribe
   fetch(`http://localhost:3001/unsubscribe`, {
