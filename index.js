@@ -160,7 +160,7 @@ app.post('/getEmails', async (req, res) => {
             }, {});
 
             console.log('Filtering emails sent more than 5 times');
-            const filteredEmails = Object.entries(emailCount).filter(([_, count]) => count > 5);
+            const filteredEmails = Object.entries(emailCount).filter(([_, count]) => count >= 1);
             console.log('Filtered emails:', filteredEmails);
 
             res.json({ filteredEmails: Object.fromEntries(filteredEmails) });  //sending the filtered emails to the front-end
