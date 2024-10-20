@@ -117,7 +117,7 @@ app.post('/getEmails', async (req, res) => {
         const response = await gmail.users.messages.list({
             userId: 'me',
             q: 'unsubscribe',
-            maxResults: 1000,
+            maxResults: 100,
         });
 
         const messages = response.data.messages;
@@ -182,9 +182,26 @@ app.post('/unsubscribe', async (req, res) => {
         return res.status(400).json({ success: false, error: 'Sender is required.' });
     }
 
-    const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
-
     try {
+        // Get the OAuth2 client
+        console.log('Getting OAuth2 client');
+        const oAuth2Client = getOAuth2Client();
+
+        // Download the token from S3 and set the credentials
+        console.log('Downloading token from S3');
+        const token = await downloadToken();
+        if (!token) {
+            console.error('Failed to retrieve token from S3');
+            return res.status(500).json({ success: false, error: 'Failed to retrieve token from S3' });
+        }
+        console.log('Token retrieved successfully');
+        oAuth2Client.setCredentials(token);
+
+        // Initialize Gmail API client
+        console.log('Initializing Gmail API client');
+        const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+        // Search for messages from the specified sender
         console.log(`Searching for messages from sender: ${sender}`);
         const response = await gmail.users.messages.list({
             userId: 'me',
@@ -192,6 +209,7 @@ app.post('/unsubscribe', async (req, res) => {
             maxResults: 100,
         });
 
+        console.log('Messages search response:', response.data);
         const messages = response.data.messages;
 
         if (messages && messages.length > 0) {
@@ -205,6 +223,7 @@ app.post('/unsubscribe', async (req, res) => {
                         addLabelIds: ['SPAM'], // Marking email as spam
                     },
                 });
+                console.log(`Message with ID: ${message.id} marked as spam`);
             }
         } else {
             console.log(`No messages found from sender: ${sender}`);
@@ -216,6 +235,7 @@ app.post('/unsubscribe', async (req, res) => {
         res.status(500).json({ success: false, error: 'Error unsubscribing', details: error.message });
     }
 });
+
 
 // OAuth2 Web-Based Flow Additions
 
