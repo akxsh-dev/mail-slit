@@ -9,7 +9,6 @@
 <body>
     <div class="container">
         <h1>Welcome to MailSlit</h1>
-        <p>Click the button below to log in to your Gmail account and manage your subscriptions.</p>
         <a href="/authorize" class="login-btn">Login with Gmail</a>
     
         <div class="email-section">
@@ -88,9 +87,45 @@
             emailContainer.innerHTML = ''; // Clear existing emails
             emails.forEach(([email, count]) => {
                 const emailDiv = document.createElement('div');
-                emailDiv.textContent = `${email} - ${count} messages`;
+                emailDiv.classList.add('email-entry');
+                emailDiv.innerHTML = `${email} - ${count} messages <button class="unsubscribe-btn" data-email="${email}">Unsubscribe</button>`;
                 emailContainer.appendChild(emailDiv);
             });
+
+            // Add event listeners to unsubscribe buttons
+            const unsubscribeButtons = document.querySelectorAll('.unsubscribe-btn');
+            unsubscribeButtons.forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const sender = event.target.getAttribute('data-email');
+                    console.log('Unsubscribe button clicked for:', sender);
+                    await unsubscribeSender(sender);
+                });
+            });
+        }
+
+        // Function to unsubscribe from an email sender
+        async function unsubscribeSender(sender) {
+            console.log('Sending unsubscribe request for sender:', sender);
+            try {
+                const response = await fetch('/unsubscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sender }),
+                });
+
+                if (response.ok) {
+                    console.log('Successfully unsubscribed from:', sender);
+                    alert(`Successfully unsubscribed from: ${sender}`);
+                } else {
+                    console.error('Failed to unsubscribe. Status:', response.status);
+                    alert(`Failed to unsubscribe from: ${sender}`);
+                }
+            } catch (error) {
+                console.error('Error occurred while unsubscribing:', error);
+                alert('Error occurred while unsubscribing. Please try again later.');
+            }
         }
 
         // Event listener for sort options
