@@ -79,58 +79,6 @@ async function downloadToken() {
     }
 }
 
-// Load client secrets from a local file and authorize the client
-// fs.readFile('client_id.json', (err, content) => {
-//     if (err) {
-//         return console.error('Error loading client secret file:', err);
-//     }
-//     authorize(JSON.parse(content));
-// });
-
-// // Function to authorize the client and obtain the OAuth2 client
-// async function authorize(credentials) {
-//     const { client_secret, client_id, redirect_uris } = credentials.web;
-//     oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-//     // Load token from S3 instead of local file
-//     const token = await downloadToken();
-//     if (token) {
-//         oAuth2Client.setCredentials(token);
-//         console.log('Tokens loaded from S3, ready to fetch emails!');
-//     } else {
-//         getAccessToken(oAuth2Client);
-//     }
-// }
-
-// // Function to get a new access token
-// function getAccessToken(oAuth2Client) {
-//     const authUrl = oAuth2Client.generateAuthUrl({
-//         access_type: 'offline',
-//         scope: SCOPES,
-//     });
-
-//     console.log('Authorize this app by visiting this url:', authUrl);
-
-//     const rl = readline.createInterface({
-//         input: process.stdin,
-//         output: process.stdout,
-//     });
-
-//     rl.question('Enter the code from that page here: ', async (code) => {
-//         rl.close();
-//         oAuth2Client.getToken(code, async (err, token) => {
-//             if (err) {
-//                 console.error('Error retrieving access token', err);
-//                 return;
-//             }
-//             console.log('Retrieved token:', token);
-//             oAuth2Client.setCredentials(token);
-//             await uploadToken(token); // Upload token to S3
-//             console.log('Tokens stored in S3, ready to fetch emails!');
-//         });
-//     });
-// }
-
 // Route to fetch emails containing the word "unsubscribe"
 app.post('/getEmails', async (req, res) => {
     const { code } = req.body;
@@ -169,7 +117,7 @@ app.post('/getEmails', async (req, res) => {
         const response = await gmail.users.messages.list({
             userId: 'me',
             q: 'unsubscribe',
-            maxResults: 100,
+            maxResults: 1000,
         });
 
         const messages = response.data.messages;
@@ -211,8 +159,11 @@ app.post('/getEmails', async (req, res) => {
                 return acc;
             }, {});
 
-            console.log('Email count:', emailCount);
-            res.json(emailCount);
+            console.log('Filtering emails sent more than 5 times');
+            const filteredEmails = Object.entries(emailCount).filter(([_, count]) => count > 5);
+            console.log('Filtered emails:', filteredEmails);
+
+            res.json({ filteredEmails: Object.fromEntries(filteredEmails) });  //sending the filtered emails to the front-end
         }
     } catch (error) {
         console.error('Error fetching emails:', error);
