@@ -25,94 +25,94 @@
     </div>
     
 
-    <script>
-        // Wait until DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM fully loaded and parsed');
-            // Sorting emails based on the selection
-            const sortOptions = document.getElementById('sortOptions');
-            const emailContainer = document.getElementById('emails');
-    
-            // Fetch emails from the backend
-            async function fetchEmails() {
-                console.log('Fetching emails from backend');
-                // Extract the code from the URL query parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const code = urlParams.get('code'); // Correct variable name
-    
-                if (!code) {
-                    console.error('No code found in URL parameters.');
-                    return [];
-                }
-    
-                try {
-                    console.log('Sending request to /getEmails endpoint');
-                    // Send the code in the request body to the backend
-                    const response = await fetch('/getEmails', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ code }), // Send the code
-                    });
-    
-                    if (response.ok) {
-                        console.log('Emails fetched successfully');
-                        return await response.json();
-                    } else {
-                        console.error('Failed to fetch emails. Status:', response.status);
-                        return [];
-                    }
-                } catch (error) {
-                    console.error('Error occurred while fetching emails:', error);
-                    return [];
-                }
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed');
+        
+        const sortOptions = document.getElementById('sortOptions');
+        const emailContainer = document.getElementById('emails');
+
+         // Function to extract the authorization code from the URL and send it to the backend
+         async function extractAuthCode() {
+            console.log('Extracting authorization code from URL');
+            const urlParams = new URLSearchParams(window.location.search); // Get URL parameters
+            const code = urlParams.get('code'); // Extract the 'code' parameter
+            if (!code) {
+                console.error('No code found in URL parameters.');
+                return [];
             }
-    
-            // Function to sort emails
-            function sortEmails(emails, sortValue) {
-                console.log('Sorting emails:', sortValue);
-                const sortedEmails = Object.entries(emails).sort(([, a], [, b]) => {
-                    return sortValue === 'highest' ? b - a : a - b;
+
+            try {
+                console.log('Sending request to /getEmails endpoint');
+                // Send the code in the request body to the backend
+                const response = await fetch('/getEmails', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code }), 
                 });
-                return sortedEmails;
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Emails fetched successfully', result.filteredEmails);
+                    return result.filteredEmails;  // Extract filteredEmails from the response
+                } else {
+                    console.error('Failed to fetch emails. Status:', response.status);
+                    return {};
+                }
+            } catch (error) {
+                console.error('Error occurred while fetching emails:', error);
+                return {};
             }
-    
-            // Function to display emails in the DOM
-            function displayEmails(emails) {
-                console.log('Displaying emails');
-                emailContainer.innerHTML = ''; // Clear existing emails
-                emails.forEach(([email, count]) => {
-                    const emailDiv = document.createElement('div');
-                    emailDiv.textContent = `${email} - ${count} messages`;
-                    emailContainer.appendChild(emailDiv);
-                });
-            }
-    
-            // Event listener for sort options
-            sortOptions.addEventListener('change', async () => {
-                console.log('Sort option changed');
-                const sortValue = sortOptions.value;
-                let emails = await fetchEmails(); // Fetch emails from backend
-                emails = sortEmails(emails, sortValue); // Sort emails based on selection
-                displayEmails(emails); // Display sorted emails
+        }
+
+        // Fetch emails from the backend
+        async function fetchEmails() {
+            console.log('Fetching emails from backend');
+            return await extractAuthCode(); 
+        }
+
+        // Function to sort emails
+        function sortEmails(emails, sortValue) {
+            console.log('Sorting emails:', sortValue);
+            const sortedEmails = Object.entries(emails).sort(([, a], [, b]) => {
+                return sortValue === 'highest' ? b - a : a - b;
             });
-    
-            // Event listener for fetch emails button
-            document.getElementById('fetchEmailsButton').addEventListener('click', async () => {
-                console.log('Fetch Emails button clicked');
-                const emails = await fetchEmails(); // Call the function to fetch emails
-                displayEmails(emails); // Display the fetched emails
+            return sortedEmails;
+        }
+
+        // Function to display emails in the DOM
+        function displayEmails(emails) {
+            console.log('Displaying emails');
+            emailContainer.innerHTML = ''; // Clear existing emails
+            emails.forEach(([email, count]) => {
+                const emailDiv = document.createElement('div');
+                emailDiv.textContent = `${email} - ${count} messages`;
+                emailContainer.appendChild(emailDiv);
             });
-    
-            // Initially fetch and display emails if code is present
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('code')) {
-                console.log('Authorization code found in URL. Fetching emails...');
-                fetchEmails().then(emails => displayEmails(emails));
-            }
+        }
+
+        // Event listener for sort options
+        sortOptions.addEventListener('change', async () => {
+            console.log('Sort option changed');
+            const sortValue = sortOptions.value;
+            const emails = emailContainer.innerHTML ? JSON.parse(emailContainer.getAttribute('data-emails')) : await fetchEmails();
+            const sortedEmails = sortEmails(emails, sortValue); // Sort emails based on selection
+            displayEmails(sortedEmails); // Display sorted emails
         });
-    </script>
+
+        // Event listener for fetch emails button
+        document.getElementById('fetchEmailsButton').addEventListener('click', async () => {
+            console.log('Fetch Emails button clicked');
+            const emails = await fetchEmails(); // Call the function to fetch emails
+            const sortValue = sortOptions.value;
+            const sortedEmails = sortEmails(emails, sortValue);
+            displayEmails(sortedEmails); // Display the fetched emails
+            emailContainer.setAttribute('data-emails', JSON.stringify(emails));
+        });
+    });
+</script>
     
 </body>
 </html>
