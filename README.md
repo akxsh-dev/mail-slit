@@ -20,3 +20,15 @@ MailSlit is a web-based application that helps users efficiently manage their em
 - Support for multiple email providers.
 - Automated email scans with notification reminders.
 - Advanced email categorization based on types (e.g., newsletters, promotions, offers).
+
+## Technologies Used
+
+- ![React.js](https://img.shields.io/badge/Front--end-React.js-61DAFB?logo=react&logoColor=white)
+- ![HTML](https://img.shields.io/badge/Front--end-HTML-E34F26?logo=html5&logoColor=white)
+- ![CSS](https://img.shields.io/badge/Front--end-CSS-1572B6?logo=css3&logoColor=white)
+- ![Node.js](https://img.shields.io/badge/Back--end-Node.js-339933?logo=node.js&logoColor=white)
+- ![Express.js](https://img.shields.io/badge/Back--end-Express.js-000000?logo=express&logoColor=white)
+- ![AWS](https://img.shields.io/badge/Database-AWS-FF9900?logo=amazon-aws&logoColor=white)
+- ![Gmail API](https://img.shields.io/badge/API-Gmail%20API-red)
+- ![OAuth 2.0](https://img.shields.io/badge/Authentication-OAuth%202.0-3b5998)
+- ![Git](https://img.shields.io/badge/Version%20Control-Git%20&%20GitHub-F05032?logo=git&logoColor=white)
