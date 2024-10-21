@@ -11,6 +11,7 @@ MailSlit is a web-based application that helps users efficiently manage their em
 ## Technologies Used
 - **Front-end:** React.js, HTML, CSS
 - **Back-end:** Node.js, Express.js
+- **Database:** AWS
 - **API:** Gmail API
 - **Authentication:** OAuth 2.0
 - **Version Control:** Git & GitHub
