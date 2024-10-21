@@ -9,19 +9,6 @@ MailSlit is a web-based application that helps users efficiently manage their em
 - **Google OAuth2 Integration:** Securely log in and authorize the app to scan and manage subscription emails using OAuth2.
 
 ## Technologies Used
-- **Front-end:** React.js, HTML, CSS
-- **Back-end:** Node.js, Express.js
-- **Database:** AWS
-- **API:** Gmail API
-- **Authentication:** OAuth 2.0
-- **Version Control:** Git & GitHub
-
-## Future Enhancements
-- Support for multiple email providers.
-- Automated email scans with notification reminders.
-- Advanced email categorization based on types (e.g., newsletters, promotions, offers).
-
-## Technologies Used
 
 - ![React.js](https://img.shields.io/badge/Front--end-React.js-61DAFB?logo=react&logoColor=white)
 - ![HTML](https://img.shields.io/badge/Front--end-HTML-E34F26?logo=html5&logoColor=white)
@@ -32,3 +19,9 @@ MailSlit is a web-based application that helps users efficiently manage their em
 - ![Gmail API](https://img.shields.io/badge/API-Gmail%20API-red)
 - ![OAuth 2.0](https://img.shields.io/badge/Authentication-OAuth%202.0-3b5998)
 - ![Git](https://img.shields.io/badge/Version%20Control-Git%20&%20GitHub-F05032?logo=git&logoColor=white)
+
+## Future Enhancements
+- Support for multiple email providers.
+- Automated email scans with notification reminders.
+- Advanced email categorization based on types (e.g., newsletters, promotions, offers).
+
